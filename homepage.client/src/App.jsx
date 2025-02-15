@@ -52,6 +52,18 @@ function Header() {
 }
 
 function AboutMe() {
+    let langs = [];
+    let langImgs = [];
+    repos.forEach(repo => {
+        if (!repo.language) {
+            return;
+        }
+        let lang = repo.language.replace("#", "_sharp");
+        if (!langs.includes(lang)) {
+            langs.push(lang);
+            langImgs.push(<img src={lang + ".png"} className="langImg" />);
+        }
+    });
   return (
     <div id="aboutme">
       {repos.length > 0 && <img src={repos[0].owner.avatar_url} alt="Avatar" />}
@@ -59,12 +71,7 @@ function AboutMe() {
         <h2>Paul Schr&ouml;der</h2>
         <h3>Student der Informatik an der Universit&auml;t Rostock</h3>
         Programmiersprachen:
-        <ul>
-          <li>Java</li>
-          <li>C#</li>
-          <li>C</li>
-          <li>Java Script</li>
-        </ul>
+              <div id="languages">{langImgs}</div>
       </div>
     </div>
   );
@@ -104,8 +111,11 @@ function ProjectShowcase() {
     <div id="projectContainer">
       <h2>Meine Projekte</h2>
       <div id="terminal">
-        <div className="terminal-line">$- user@homepage repos list</div>
-        <pre className="typed-text" dangerouslySetInnerHTML={{ __html: displayText }}></pre>
+              <div id="terminal-bar"><span>user@webpage</span>_ &#x25A1; &#x2715;</div> 
+        <div id="terminal-content">
+            <div className="terminal-line">$- user@homepage repos list</div>
+            <pre className="typed-text" dangerouslySetInnerHTML={{ __html: displayText }}></pre>
+        </div>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-#root {
+﻿#root {
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -78,25 +78,48 @@ body {
     margin: 2rem;
 }
 
-#terminal {
+#terminal-content {
     font-family: Courier New, Courier, monospace;
     width: 100%;
     max-width: 800px;
     background-color: #000;
     color: #0f0;
-    padding: 1rem;
-    border-radius: 10px;
-    box-shadow: 0 0 10px #000;
     overflow-y: auto;
     overflow-x: auto;
     text-align: left;
     font-family: monospace;
     max-height: 400px;
     transition: all 0.3s ease-in-out;
+    scrollbar-gutter: stable both-edges;
+    border-radius: 0px 0px 0px 10px;
+}
+
+#terminal {
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 0 10px #000;
+    border-radius: 10px;
 }
 
 #terminal:hover {
     transform: scale(1.05);
+}
+
+#terminal-bar {
+    height: 2rem;
+    width: 100%;
+    background-color: #101010;
+    color: #f0f0f0;
+    text-align: right;
+    letter-spacing: 0.5em;
+    display: flex;
+    justify-content: space-between;
+    border-radius: 10px 10px 0 0;
+}
+
+#terminal-bar > span {
+    font-family: monospace;
+    letter-spacing: 0.1em;
+    padding-left: 1em;
 }
 
 .terminal-line {
@@ -130,4 +153,15 @@ body {
 #codeBackground {
     background-image: url("Code.png");
     background-size: cover;
+}
+
+#languages {
+    padding: 1em 0 1em 0;
+}
+
+.langImg {
+    width: 4em;
+    height: 4em;
+    filter: drop-shadow(0px 0px 10px #222);
+    padding: 10px;
 }
