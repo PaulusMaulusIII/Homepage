@@ -4,12 +4,13 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <SpaRoot>..\homepage.client</SpaRoot>
+    <SpaRoot>..\catprinter_web_app.client</SpaRoot>
     <SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>
-    <SpaProxyServerUrl>https://localhost:50231</SpaProxyServerUrl>
+    <SpaProxyServerUrl>https://localhost:54601</SpaProxyServerUrl>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="InTheHand.Net.Bluetooth" Version="4.1.44" />
     <PackageReference Include="Microsoft.AspNetCore.SpaProxy">
       <Version>8.*-*</Version>
     </PackageReference>
@@ -17,9 +18,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\homepage.client\Homepage.client.esproj">
+    <ProjectReference Include="..\..\Catprinter_Lib\Catprinter_Lib.csproj" />
+    <ProjectReference Include="..\catprinter_web_app.client\catprinter_web_app.client.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>

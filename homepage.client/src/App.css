@@ -45,7 +45,7 @@ header.hidden {
 #aboutme {
     justify-content: center;
     padding: 2rem 0 2rem 0;
-    margin: 200px 0 0 0;
+    margin: 3rem 0 0 0;
     display: flex;
     flex-direction: row;
     text-align: left;
@@ -60,9 +60,17 @@ header.hidden {
     transform: scale(1.05);
 }
 
-#aboutme > img {
-    height: 250px;
+#aboutme > a > img {
+    height: 300px;
     padding: 25px;
+}
+
+#aboutme > a {
+    transition: all 0.3s ease-in-out;
+}
+
+#aboutme > a:hover {
+    transform: scale(1.05);
 }
 
 body {
@@ -164,4 +172,28 @@ body {
     height: 4em;
     filter: drop-shadow(0px 0px 10px #222);
     padding: 10px;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    #aboutme {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        transform: none; /* Disable hover effect */
+        margin: 0;
+    }
+
+    #aboutme:hover {
+        transform: none; /* Disable hover effect */
+    }
+
+    #aboutme > a > img {
+        height: auto;
+        width: 80%;
+    }
+
+    #projectContainer {
+        display: none; /* Hide project showcase */
+    }
 }

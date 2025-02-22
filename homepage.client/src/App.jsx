@@ -13,13 +13,16 @@ console.log(repos);
 function App() {
   return (
     <div id="codeBackground">
-      <Header />
       <AboutMe />
       <ProjectShowcase />
     </div>
   );
 }
 
+/**
+ * @deprecated Header has been removed entirely, but will be kept for reference.
+ */
+ // eslint-disable-next-line no-unused-vars
 function Header() {
   const [lastScrollTop, setLastScrollTop] = useState(0);
   const [visible, setVisible] = useState(true);
@@ -61,17 +64,16 @@ function AboutMe() {
         let lang = repo.language.replace("#", "_sharp");
         if (!langs.includes(lang)) {
             langs.push(lang);
-            langImgs.push(<img src={lang + ".png"} className="langImg" />);
+            langImgs.push(<img src={lang + ".png"} className="langImg" key={lang} />);
         }
     });
   return (
     <div id="aboutme">
-      {repos.length > 0 && <img src={repos[0].owner.avatar_url} alt="Avatar" />}
+          {repos.length > 0 && <a href="https://github.com/PaulusMaulusIII"><img src={repos[0].owner.avatar_url} alt="Avatar" /></a>}
       <div>
-        <h2>Paul Schr&ouml;der</h2>
+        <h1>Paul Schr&ouml;der</h1>
         <h3>Student der Informatik an der Universit&auml;t Rostock</h3>
-        Programmiersprachen:
-              <div id="languages">{langImgs}</div>
+        <div id="languages">{langImgs}</div>
       </div>
     </div>
   );
@@ -113,7 +115,7 @@ function ProjectShowcase() {
       <div id="terminal">
               <div id="terminal-bar"><span>user@webpage</span>_ &#x25A1; &#x2715;</div> 
         <div id="terminal-content">
-            <div className="terminal-line">$- user@homepage repos list</div>
+            <div className="terminal-line">$- user@homepage/home github repos -v PaulusMaulusIII</div>
             <pre className="typed-text" dangerouslySetInnerHTML={{ __html: displayText }}></pre>
         </div>
       </div>

@@ -1,6 +1,0 @@
-@Homepage.Server_HostAddress = http://localhost:5094
-
-GET {{Homepage.Server_HostAddress}}/api/Github/PaulusMaulusIII/repos
-Accept: application/json
-
-###
