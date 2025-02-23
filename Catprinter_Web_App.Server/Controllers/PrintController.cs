@@ -1,11 +1,8 @@
-using Microsoft.AspNetCore.Mvc;
-using Catprinter.Utils;
 using System.Drawing;
-using InTheHand.Net;
+using Catprinter.Utils;
+using InTheHand.Net.Bluetooth;
 using InTheHand.Net.Sockets;
-using Microsoft.AspNetCore.SignalR;
-using Catprinter.Web.Hubs;
-using System.IO;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Catprinter.Web.Controllers
 {
@@ -13,119 +10,96 @@ namespace Catprinter.Web.Controllers
     [Route("api/[controller]")]
     public class PrintController : ControllerBase
     {
-        private readonly IPrinterService _printerService;
-        private readonly IHubContext<PrintHub> _hubContext;
-        private static BluetoothClient _client;
-        private static BluetoothDeviceInfo _printer;
-        private static Stream _stream;
+        BluetoothClient client;
+        BluetoothDeviceInfo device;
 
-        public PrintController(IPrinterService printerService, IHubContext<PrintHub> hubContext)
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchBluetoothDevices()
         {
-            _printerService = printerService;
-            _hubContext = hubContext;
+            client = new BluetoothClient();
+            IReadOnlyCollection<BluetoothDeviceInfo> devices = client.DiscoverDevices();
+            return Ok(devices);
         }
 
-        [HttpPost("connect-printer")]
-        public async Task<IActionResult> ConnectToPrinter()
+        [HttpPost("connect")]
+        public async Task<IActionResult> ConnectToPrinter(String deviceName)
         {
-            try
+            if (client == null)
             {
-                await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Finding Printer");
-                _client = new BluetoothClient();
-                IReadOnlyCollection<BluetoothDeviceInfo> devices = _client.DiscoverDevices();
-                _printer = devices.FirstOrDefault(device => device.DeviceName == "X5h-0000");
-
-                if (_printer == null)
-                {
-                    await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Printer not found");
-                    return NotFound("Printer not found.");
-                }
-
-                BluetoothAddress address = _printer.DeviceAddress;
-                Guid spp = _printer.InstalledServices.FirstOrDefault(service => service.ToString().ToUpper().Equals("00001101-0000-1000-8000-00805F9B34FB"));
-
-                if (spp == Guid.Empty)
-                {
-                    await _hubContext.Clients.All.SendAsync("ReceiveMessage", "SPP service not found");
-                    return NotFound("SPP service not found.");
-                }
-
-                await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Connecting to printer");
-                _client.Connect(_printer.DeviceAddress, spp);
-                _stream = _client.GetStream();
-                await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Connected to printer");
-
-                return Ok("Connected to printer successfully.");
+                NotFound("Client has not been initiated");
             }
-            catch (Exception ex)
+            IReadOnlyCollection<BluetoothDeviceInfo> devices = client.DiscoverDevices().Where(
+                d => d.DeviceName == deviceName
+            ).ToList();
+
+            if (!devices.Any())
             {
-                await _hubContext.Clients.All.SendAsync("ReceiveMessage", $"Internal server error: {ex.Message}");
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return NotFound("Device not found");
             }
+
+            device = devices.First();
+            Guid printService = new Guid();
+            foreach (Guid service in device.InstalledServices)
+            {
+                if (service.ToString().ToUpper().Equals("00001101-0000-1000-8000-00805F9B34FB"))
+                {
+                    printService = service;
+                    break;
+                }
+            }
+            if (!printService.ToString().ToUpper().Equals("00001101-0000-1000-8000-00805F9B34FB"))
+            {
+                return NotFound("No compatible Print Service found");
+            }
+            client.Connect(device.DeviceAddress, printService);
+            return Ok("Connected To:" + device.DeviceName);
         }
 
-        [HttpPost("upload-image")]
-        public async Task<IActionResult> UploadImage([FromForm] IFormFile image)
+        [HttpPost("print")]
+        public async Task<IActionResult> PrintImage([FromBody] PrintRequest request)
         {
-            if (image == null || image.Length == 0)
+            if (client == null)
             {
-                return BadRequest("Invalid image.");
+                NotFound("Client has not been initiated");
             }
-
-            var filePath = Path.Combine("UploadedImages", image.FileName);
-
-            try
+            using (Stream stream = client.GetStream())
             {
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                Bitmap img;
+                if (request.ImageFile != null)
                 {
-                    await image.CopyToAsync(stream);
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        await request.ImageFile.CopyToAsync(ms);
+                        img = new Bitmap(ms);
+                    }
+                }
+                else if (!string.IsNullOrEmpty(request.Base64Image))
+                {
+                    byte[] imageBytes = Convert.FromBase64String(request.Base64Image);
+                    using (MemoryStream ms = new MemoryStream(imageBytes))
+                    {
+                        img = new Bitmap(ms);
+                    }
+
+                }
+                else
+                {
+                    return BadRequest("No image provided");
                 }
 
-                return Ok(new { ImagePath = filePath });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-
-        [HttpPost("print-image")]
-        public async Task<IActionResult> PrintImage([FromBody] PrintImageRequest request)
-        {
-            if (request == null || string.IsNullOrEmpty(request.ImagePath))
-            {
-                return BadRequest("Invalid request.");
+                byte[] commands = PrinterCommands.GetImgPrintCmd(img, request.Energy, request.DPI);
+                await stream.WriteAsync(commands, 0, commands.Length);
             }
 
-            try
-            {
-                await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Generating Image Data");
-                Bitmap img = ImageProcessing.ReadImg(request.ImagePath, PrinterCommands.PRINT_WIDTH, "floyd-steinberg", true);
-                img.Save("processed_image.jpg");
-                await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Image Data Generated");
-
-                if (_client == null || _printer == null || _stream == null)
-                {
-                    await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Printer not connected");
-                    return BadRequest("Printer not connected.");
-                }
-
-                await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Generating and sending commands");
-                _stream.Write(PrinterCommands.GetImgPrintCmd(img, 0xffff));
-                await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Commands sent");
-
-                return Ok("Image printed successfully.");
-            }
-            catch (Exception ex)
-            {
-                await _hubContext.Clients.All.SendAsync("ReceiveMessage", $"Internal server error: {ex.Message}");
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            return Ok("Please await print");
         }
     }
 
-    public class PrintImageRequest
+    public class PrintRequest
     {
-        public string ImagePath { get; set; }
+        public string Base64Image { get; set; }
+        public IFormFile ImageFile { get; set; }
+        public int Energy { get; set; }
+        public int DPI { get; set; }
     }
 }

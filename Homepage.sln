@@ -5,7 +5,16 @@ VisualStudioVersion = 17.13.35806.99
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "Homepage.client", "homepage.client\Homepage.client.esproj", "{AC5B5BE0-11CE-CC20-601D-2DA433D1FD9E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Homepage.Server", "Homepage.Server\Homepage.Server.csproj", "{58337064-D4DB-0383-2FB4-B0723AEB87E3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catprinter_Web_App.Server", "Catprinter_Web_App.Server\Catprinter_Web_App.Server.csproj", "{1F327CA5-78FF-C13C-1EB1-61494F848B14}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catprinter_Lib", "..\Catprinter_Lib\Catprinter_Lib.csproj", "{0FEAE942-7371-5DF9-2A08-B3E64C0F0C60}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catprinter_Console_App", "..\Catprinter_Console_App\Catprinter_Console_App.csproj", "{B1F7F193-E229-2D49-1445-1D09B10D8398}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,10 +28,18 @@ Global
 		{AC5B5BE0-11CE-CC20-601D-2DA433D1FD9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC5B5BE0-11CE-CC20-601D-2DA433D1FD9E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AC5B5BE0-11CE-CC20-601D-2DA433D1FD9E}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{58337064-D4DB-0383-2FB4-B0723AEB87E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{58337064-D4DB-0383-2FB4-B0723AEB87E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{58337064-D4DB-0383-2FB4-B0723AEB87E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{58337064-D4DB-0383-2FB4-B0723AEB87E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F327CA5-78FF-C13C-1EB1-61494F848B14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F327CA5-78FF-C13C-1EB1-61494F848B14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F327CA5-78FF-C13C-1EB1-61494F848B14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F327CA5-78FF-C13C-1EB1-61494F848B14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FEAE942-7371-5DF9-2A08-B3E64C0F0C60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FEAE942-7371-5DF9-2A08-B3E64C0F0C60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FEAE942-7371-5DF9-2A08-B3E64C0F0C60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FEAE942-7371-5DF9-2A08-B3E64C0F0C60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1F7F193-E229-2D49-1445-1D09B10D8398}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1F7F193-E229-2D49-1445-1D09B10D8398}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1F7F193-E229-2D49-1445-1D09B10D8398}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1F7F193-E229-2D49-1445-1D09B10D8398}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

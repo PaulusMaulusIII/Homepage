@@ -1,5 +1,6 @@
 import './App.css';
 import { useEffect, useState } from 'react';
+import CatPrinterUI from './CatPrinterUI';
 
 let repos = [];
 
@@ -13,8 +14,9 @@ console.log(repos);
 function App() {
   return (
     <div id="codeBackground">
-      <AboutMe />
-      <ProjectShowcase />
+        <AboutMe />
+        <ProjectShowcase />
+        <CatPrinterUI />
     </div>
   );
 }
