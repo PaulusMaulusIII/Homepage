@@ -1,18 +1,23 @@
-@Catprinter_Web_App.Server_HostAddress = http://localhost:5152
-
-POST {{Catprinter_Web_App.Server_HostAddress}}/connect-printer/
+GET {{Catprinter_Web_App.Server_HostAddress}}/search/
 Accept: application/json
 
 ###
 
-POST {{Catprinter_Web_App.Server_HostAddress}}/upload-image
-Content-Type: multipart/form-data
+POST {{Catprinter_Web_App.Server_HostAddress}}/connect/
+Content-Type: text/plain
 Accept: application/json
 
 ###
 
-POST {{Catprinter_Web_App.Server_HostAddress}}/print-image
+POST {{Catprinter_Web_App.Server_HostAddress}}/process/
 Content-Type: application/json
 Accept: application/json
 
 ###
+
+POST {{Catprinter_Web_App.Server_HostAddress}}/print/
+Content-Type: application/json
+Accept: application/json
+
+###
+

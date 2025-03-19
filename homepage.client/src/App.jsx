@@ -1,6 +1,6 @@
 import './App.css';
 import { useEffect, useState } from 'react';
-import CatPrinterUI from './CatPrinterUI';
+// import CatPrinterUI from './CatPrinterUI';
 
 let repos = [];
 
@@ -16,7 +16,7 @@ function App() {
     <div id="codeBackground">
         <AboutMe />
         <ProjectShowcase />
-        <CatPrinterUI />
+        {/*<CatPrinterUI /> */ }
     </div>
   );
 }
@@ -86,7 +86,7 @@ function ProjectShowcase() {
 
   useEffect(() => {
     const sortedRepos = repos
-      .filter(repo => repo.name !== "PaulusMaulusIII" && repo.language) // Filter out repos with null language
+      .filter(repo => repo.name !== "PaulusMaulusIII" && repo.language)
       .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
       .sort((a, b) => a.language.localeCompare(b.language));
 

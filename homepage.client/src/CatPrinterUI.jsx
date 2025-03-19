@@ -1,49 +1,62 @@
-import './CatPrinterUI.css';
-import { useState } from 'react';
+import { useState } from "react";
+import "./CatPrinterUI.css";
 
-function CatPrinterUI() {
-    function setEnergy(energy) {
-        if (0x0000 < energy <= 0xffff && energy.length == 6) {
-            console.log(energy);
+export default function CatPrinterUI() {
+    const [dpi, setDpi] = useState(200);
+    const [energy, setEnergy] = useState(50);
+    const [dithering, setDithering] = useState("Floyd-Steinberg");
+    const [invert, setInvert] = useState(false);
+    const [image, setImage] = useState(null);
+
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => setImage(e.target.result);
+            reader.readAsDataURL(file);
         }
-    }
+    };
 
-    function setDithering(algorithm) {
-        console.log(algorithm)
-    }
+    return (
+        <div className="container">
+            {/* Left Panel - Controls */}
+            <div className="panel">
+                <h2>Printer Settings</h2>
+                <input type="file" accept="image/*" onChange={handleImageUpload} className="file-input" />
 
-    function getFile() {
+                <label>DPI ({dpi})</label>
+                <input type="range" min="100" max="600" value={dpi} onChange={(e) => setDpi(e.target.value)} className="slider" />
 
-    }
+                <label>Energy Level ({energy}%)</label>
+                <input type="range" min="0" max="100" value={energy} onChange={(e) => setEnergy(e.target.value)} className="slider" />
 
-    return (<div id="container">
-        <div id="image preview">
-        </div>
-        <div id="options">
-            <div id="image-options">
-                <input type="file"></input>
-                <select required={true} onChange={ e => setDithering(e.target.value)}>
-                    <option value="">-- Please choose a dithering algorithm  --</option>
-                    <optgroup label="No Dithering">
-                        <option value="none">No Dithering</option>
-                    </optgroup>
-                    <optgroup label="Simple Dithering">
-                        <option value="halftone">Half Tone</option>
-                    </optgroup>
-                    <optgroup label="Smart Dithering">
-                        <option value="atkinson">Atkinson Dithering</option>
-                        <option value="floyd-steinberg">Floyd-Steinberg Dithering</option>
-                    </optgroup>
+                <label>Dithering Algorithm</label>
+                <select value={dithering} onChange={(e) => setDithering(e.target.value)} className="dropdown">
+                    <option value="Floyd-Steinberg">Floyd-Steinberg</option>
+                    <option value="Atkinson">Atkinson</option>
+                    <option value="Ordered">Ordered</option>
                 </select>
-                <input type="checkbox"></input>
-                <label>Invert Image</label>
+
+                <label>Invert Colors</label>
+                <input type="checkbox" checked={invert} onChange={(e) => setInvert(e.target.checked)} className="checkbox" />
+
+                <div className="button-group">
+                    <button className="button primary">Process Image</button>
+                    <button className="button secondary">Print</button>
+                </div>
             </div>
-            <div id="print-options">
-                <input id="energy" defaultValue="0xFFFF" onChange={e => setEnergy(e.target.value)}></input>
+
+            {/* Right Panel - Image Preview */}
+            <div className="panel preview">
+                <h2>Preview</h2>
+                <div className="preview-box">
+                    {image ? (
+                        <img src={image} alt="Preview" className={`preview-image ${invert ? "invert" : ""}`} />
+                    ) : (
+                        <p className="no-image">No image uploaded</p>
+                    )}
+                </div>
             </div>
         </div>
-    </div>
     );
 }
-
-export default CatPrinterUI;

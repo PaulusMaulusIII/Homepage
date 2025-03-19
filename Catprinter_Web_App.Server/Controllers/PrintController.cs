@@ -1,6 +1,6 @@
 using System.Drawing;
+using System.Drawing.Imaging;
 using Catprinter.Utils;
-using InTheHand.Net.Bluetooth;
 using InTheHand.Net.Sockets;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,96 +10,53 @@ namespace Catprinter.Web.Controllers
     [Route("api/[controller]")]
     public class PrintController : ControllerBase
     {
-        BluetoothClient client;
-        BluetoothDeviceInfo device;
-
-        [HttpGet("search")]
-        public async Task<IActionResult> SearchBluetoothDevices()
+        [HttpPost("process")]
+        [ProducesResponseType<IActionResult>(StatusCodes.Status200OK)]
+        [ProducesResponseType<IActionResult>(StatusCodes.Status404NotFound)]
+        [ProducesResponseType<IActionResult>(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ProcessImage(IFormFile imgFile, string dithering, bool invert)
         {
-            client = new BluetoothClient();
-            IReadOnlyCollection<BluetoothDeviceInfo> devices = client.DiscoverDevices();
-            return Ok(devices);
+            Bitmap img = null;
+            Bitmap processedImg = null;
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                await imgFile.CopyToAsync(ms);
+                img = new Bitmap(ms);
+            }
+            if (img == null)
+            {
+                return NotFound("Failed to upload image");
+            }
+
+            processedImg = ImageProcessing.ReadImg(img, PrinterCommands.PRINT_WIDTH, dithering, invert);
+
+            if (processedImg == null)
+            {
+                return BadRequest("Image could not be processed");
+            }
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                processedImg.Save(ms, ImageFormat.Jpeg);
+                var base64Image = Convert.ToBase64String(ms.ToArray());
+                return Ok(base64Image);
+            }
         }
 
-        [HttpPost("connect")]
-        public async Task<IActionResult> ConnectToPrinter(String deviceName)
+        [HttpPost("generatePrintCmd")]
+        [ProducesResponseType<IActionResult>(StatusCodes.Status200OK)]
+        public IActionResult GeneratePrintCmd(int energy, int dpi)
         {
-            if (client == null)
-            {
-                NotFound("Client has not been initiated");
-            }
-            IReadOnlyCollection<BluetoothDeviceInfo> devices = client.DiscoverDevices().Where(
-                d => d.DeviceName == deviceName
-            ).ToList();
+            Bitmap img = new Bitmap("processed_image.jpg");
 
-            if (!devices.Any())
+            if (img == null)
             {
-                return NotFound("Device not found");
+                return NotFound("Failed to load image");
             }
 
-            device = devices.First();
-            Guid printService = new Guid();
-            foreach (Guid service in device.InstalledServices)
-            {
-                if (service.ToString().ToUpper().Equals("00001101-0000-1000-8000-00805F9B34FB"))
-                {
-                    printService = service;
-                    break;
-                }
-            }
-            if (!printService.ToString().ToUpper().Equals("00001101-0000-1000-8000-00805F9B34FB"))
-            {
-                return NotFound("No compatible Print Service found");
-            }
-            client.Connect(device.DeviceAddress, printService);
-            return Ok("Connected To:" + device.DeviceName);
+            byte[] command = PrinterCommands.GetImgPrintCmd(img, energy, dpi);
+            return Ok(Convert.ToBase64String(command));
         }
-
-        [HttpPost("print")]
-        public async Task<IActionResult> PrintImage([FromBody] PrintRequest request)
-        {
-            if (client == null)
-            {
-                NotFound("Client has not been initiated");
-            }
-            using (Stream stream = client.GetStream())
-            {
-                Bitmap img;
-                if (request.ImageFile != null)
-                {
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        await request.ImageFile.CopyToAsync(ms);
-                        img = new Bitmap(ms);
-                    }
-                }
-                else if (!string.IsNullOrEmpty(request.Base64Image))
-                {
-                    byte[] imageBytes = Convert.FromBase64String(request.Base64Image);
-                    using (MemoryStream ms = new MemoryStream(imageBytes))
-                    {
-                        img = new Bitmap(ms);
-                    }
-
-                }
-                else
-                {
-                    return BadRequest("No image provided");
-                }
-
-                byte[] commands = PrinterCommands.GetImgPrintCmd(img, request.Energy, request.DPI);
-                await stream.WriteAsync(commands, 0, commands.Length);
-            }
-
-            return Ok("Please await print");
-        }
-    }
-
-    public class PrintRequest
-    {
-        public string Base64Image { get; set; }
-        public IFormFile ImageFile { get; set; }
-        public int Energy { get; set; }
-        public int DPI { get; set; }
     }
 }
