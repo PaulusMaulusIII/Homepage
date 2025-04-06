@@ -39,11 +39,9 @@ jobs:
           cache: 'npm'
           path: './homepage.client'
       - name: Install dependencies
-        run: npm ci
-        working-directory: ./homepage.client
+        run: cd homepage.client; npm ci
       - name: Build
-        run: npm run build
-        working-directory: ./homepage.client
+        run: cd homepage.client; npm run build
       - name: Setup Pages
         uses: actions/configure-pages@v4
         with:
