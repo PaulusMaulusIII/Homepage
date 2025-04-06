@@ -30,8 +30,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Switch to page root
-        run: cd homepage.client
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -40,7 +38,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build
-        run: npm run build
+        run: cd homepage.client; npm run build
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
