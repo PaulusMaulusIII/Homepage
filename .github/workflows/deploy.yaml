@@ -30,17 +30,24 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          path: './homepage.client'
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
+          path: './homepage.client'
       - name: Install dependencies
-        run: cd homepage.client; npm ci
+        run: npm ci
+        working-directory: ./homepage.client
       - name: Build
-        run: cd homepage.client; npm run build
+        run: npm run build
+        working-directory: ./homepage.client
       - name: Setup Pages
         uses: actions/configure-pages@v4
+        with:
+          path: './homepage.client'
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -48,3 +55,5 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          path: './homepage.client'
