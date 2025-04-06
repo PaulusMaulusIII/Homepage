@@ -30,14 +30,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          path: './homepage.client'
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
-          path: './homepage.client'
       - name: Install dependencies
         run: cd homepage.client; npm ci
       - name: Build
