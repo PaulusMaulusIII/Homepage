@@ -159,7 +159,7 @@ body {
 }
 
 #codeBackground {
-    background-image: url("Code.png");
+    background-image: url("/CodeBackground.png");
     background-size: cover;
     height: 100%;
 }
